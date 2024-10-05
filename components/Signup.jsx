@@ -7,7 +7,7 @@ const data = ["Admin", "Examiner", "Student"];
 const Signup = () => {
   const [selectedIndex, setSelectedIndex] = React.useState(new IndexPath(0));
   const displayValue = data[selectedIndex.row];
-  const renderOption = (title) => <SelectItem title={title} />;
+  const renderOption = (title,i) => <SelectItem key={i} title={title} />;
   return (
     <View style={{ paddingHorizontal: 25, padding: 5 }}>
       <View style={{ marginBottom: 20 }}>
