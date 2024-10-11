@@ -1,14 +1,13 @@
-import { View, Text, Image } from "react-native";
 import React from "react";
-import Login from "../../components/Login";
-
-const Search = () => {
+import Signup from "../../components/Signup";
+import { Image, View } from "react-native";
+const SignupComp = () => {
   return (
-    <View>
+    <View style={{display:"flex", flexDirection:"column", gap:40, alignItems:"center", justifyContent:"center", paddingHorizontal:20,paddingVertical:150}}>
       <View
         style={{
           display: "flex",
-          marginVertical: 50,
+          // marginVertical: 50,
           justifyContent: "center",
           alignItems: "center",
           // height: 100,
@@ -19,9 +18,9 @@ const Search = () => {
           style={{ height: 55, width: 123 }}
         />
       </View>
-      {/* <Login /> */}
+      <Signup />
     </View>
   );
 };
 
-export default Search;
+export default SignupComp;
