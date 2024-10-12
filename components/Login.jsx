@@ -1,18 +1,22 @@
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Formik } from "formik";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React from "react";
-import * as Yup from "yup"; 
+import React, { useEffect } from "react";
+import * as Yup from "yup";
 import { Link, useRouter } from "expo-router";
 import { useAuth } from "../context/AuthContext";
+import axios from "axios";
+
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
-  .matches(emailRegex, "Invalid email format")
-  .required("Email is required"),
-  password: Yup.string().min(8, "Password too short").required("Password is required"),
+    .matches(emailRegex, "Invalid email format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(8, "Password too short")
+    .required("Password is required"),
 });
 
 const Login = () => {
@@ -21,9 +25,13 @@ const Login = () => {
 
   const onLogin = async (values) => {
     // Simulating token storage and login action
-    alert(values)
+    axios.post("http://192.168.0.116:8000/users/sign-in", {
+      email: values.email,
+      password: values.password,
+    });
+    alert(values);
     await AsyncStorage.setItem("token", "test-token");
-    login();  // Trigger context login
+    login(); // Trigger context login
     router.replace("/home");
   };
 
@@ -52,9 +60,25 @@ const Login = () => {
           password: "",
         }}
         onSubmit={(values) => {
-          onLogin(values);
+          axios.post("http://192.168.0.116:8000/users/sign-in", {
+            email: values.email,
+            password: values.password,
+          })
+          .then((res)=>{
+            alert(JSON.stringify(res))
+            AsyncStorage.setItem("token",res.data.token);
+            alert(res.data.message)
+            login(); // Trigger context login
+            router.replace("/home");
+          })
+          .catch((err)=>{
+            alert(err)
+          })
+          // alert(values);
+          // await AsyncStorage.setItem("token", "test-token");
+          // login(); // Trigger context login
         }}
-        validationSchema={LoginSchema} 
+        validationSchema={LoginSchema}
       >
         {({
           handleChange,
@@ -92,7 +116,9 @@ const Login = () => {
                 }}
               />
               {touched.email && errors.email && (
-                <Text style={{ color: "#e31c33", fontSize: 12 }}>{errors.email}</Text>
+                <Text style={{ color: "#e31c33", fontSize: 12 }}>
+                  {errors.email}
+                </Text>
               )}
             </View>
             <View>
@@ -122,8 +148,10 @@ const Login = () => {
                   backgroundColor: "#dee2e7",
                 }}
               />
-                {touched.password && errors.password && (
-                <Text style={{ color: "#e31c33", fontSize: 12 }}>{errors.password}</Text>
+              {touched.password && errors.password && (
+                <Text style={{ color: "#e31c33", fontSize: 12 }}>
+                  {errors.password}
+                </Text>
               )}
             </View>
 
@@ -139,7 +167,11 @@ const Login = () => {
                 }}
               >
                 <Text
-                  style={{ textAlign: "center", color: "white", fontWeight: "500" }}
+                  style={{
+                    textAlign: "center",
+                    color: "white",
+                    fontWeight: "500",
+                  }}
                 >
                   LOGIN
                 </Text>

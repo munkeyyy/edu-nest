@@ -4,10 +4,10 @@ import { IndexPath, Layout, Select, SelectItem } from "@ui-kitten/components";
 import { Link, useRouter } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import axios from "axios"
+import axios from "axios";
 
 // Data for the roles
-const data = ["Admin", "Examiner", "Student"];
+const roleData = ["Admin", "Examiner", "Student"];
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Yup Schema for validation
@@ -26,7 +26,7 @@ const Signup = () => {
   const [selectedIndex, setSelectedIndex] = React.useState(new IndexPath(0));
   const router = useRouter();
 
-  const displayValue = data[selectedIndex.row];
+  const displayValue = roleData[selectedIndex.row];
 
   const renderOption = (title, i) => <SelectItem key={i} title={title} />;
 
@@ -36,16 +36,32 @@ const Signup = () => {
         fullName: "",
         email: "",
         password: "",
-        role: data[0],
+        role: roleData[0],
       }}
       validationSchema={SignupSchema}
       onSubmit={(values) => {
-        // handle form submission
-        axios.post('http://localhost:8000/users/sign-up', values)
-        .then((res)=>{console.log(res.data)
-          router.push("/login")
-        })
-        .catch((err)=>alert(err.response.data))
+        axios
+          .post("http://192.168.0.116:8000/users/sign-up", {
+            fullname: values.fullName,
+            email: values.email,
+            password: values.password,
+            role: values.role,
+          })
+          .then((res) => {
+            console.log(res);
+            router.push("/login");
+          })
+          .catch((err) => {
+            // Check if err.response exists, otherwise log a generic error message
+            alert(err);
+            console.log(err);
+            // if (err.response && err.response.data) {
+            //   alert(err.response.data);
+            // } else {
+            //   alert('An error occurred. Please try again.');
+            // }
+          });
+        console.log(values);
         alert(JSON.stringify(values, null, 2));
       }}
     >
@@ -195,11 +211,11 @@ const Signup = () => {
                 value={displayValue}
                 onSelect={(index) => {
                   setSelectedIndex(index);
-                  setFieldValue("role", data[index.row]);
+                  setFieldValue("role", roleData[index.row]);
                 }}
                 style={{ backgroundColor: "#EDEFF2", borderWidth: 0 }}
               >
-                {data.map(renderOption)}
+                {roleData.map(renderOption)}
               </Select>
             </Layout>
             {errors.role && touched.role && (
