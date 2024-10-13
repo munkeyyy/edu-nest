@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "../context/AuthContext";
 import Signup from "./../components/Signup";
 import { useEffect, useState } from "react";
+
 export default function RootLayout() {
   const [auth, setAuth] = useState("");
   async function getToken() {
@@ -31,6 +32,7 @@ export default function RootLayout() {
             <Stack.Screen name="(auth)" />
           )}
         </Stack>
+
       </ApplicationProvider>
     </AuthProvider>
   );

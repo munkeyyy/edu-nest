@@ -1,4 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+  ToastAndroid,
+  Alert,
+} from "react-native";
 import { Formik } from "formik";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect } from "react";
@@ -6,7 +14,6 @@ import * as Yup from "yup";
 import { Link, useRouter } from "expo-router";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
-
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -60,20 +67,27 @@ const Login = () => {
           password: "",
         }}
         onSubmit={(values) => {
-          axios.post("http://192.168.0.116:8000/users/sign-in", {
-            email: values.email,
-            password: values.password,
-          })
-          .then((res)=>{
-            alert(JSON.stringify(res))
-            AsyncStorage.setItem("token",res.data.token);
-            alert(res.data.message)
-            login(); // Trigger context login
-            router.replace("/home");
-          })
-          .catch((err)=>{
-            alert(err)
-          })
+          axios
+            .post("http://192.168.0.116:8000/users/sign-in", {
+              email: values.email,
+              password: values.password,
+            })
+            .then((res) => {
+              alert(JSON.stringify(res));
+              AsyncStorage.setItem("token", res.data.token);
+              alert(res.data.message);
+              login(); // Trigger context login
+              router.replace("/home");
+            })
+            .catch((err) => {
+              if (Platform.OS === "android") {
+                ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+              } else if (Platform.OS === "ios") {
+                Alert.alert("Error", errorMessage); // For iOS
+              } else {
+                alert(err?.response?.data?.message);
+              }
+            });
           // alert(values);
           // await AsyncStorage.setItem("token", "test-token");
           // login(); // Trigger context login
@@ -88,7 +102,7 @@ const Login = () => {
           errors,
           touched,
         }) => (
-          <View>
+          <View style={{padding:10}}>
             <View>
               <Text
                 style={{
