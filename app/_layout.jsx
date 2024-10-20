@@ -27,7 +27,7 @@ export default function RootLayout() {
         >
           {/* <Stack.Screen name="index" /> */}
           {auth ? (
-            <Stack.Screen name="(tabs)" />
+            <><Stack.Screen name="(tabs)" /><Stack.Screen name="(authenticated)" /></>
           ) : (
             <Stack.Screen name="(auth)" />
           )}

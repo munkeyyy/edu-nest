@@ -1,8 +1,10 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import React from "react";
-import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from "react-native";
 
 const ScheduledExamPortal = () => {
+  const [searchTerm, setSearchTerm] = useState('')
     const scheduledExams = [
         { id: 1, title: 'Mathematics', subject: 'Algebra', date: '2024-03-15', time: '10:00 AM', duration: '2 hours', questions: 50, status: 'upcoming' },
         { id: 2, title: 'Science', subject: 'Biology', date: '2024-03-18', time: '2:00 PM', duration: '1.5 hours', questions: 40, status: 'upcoming' },
@@ -14,6 +16,9 @@ const ScheduledExamPortal = () => {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
         return new Date(dateString).toLocaleDateString(undefined, options)
       }
+      const filteredExams = scheduledExams.filter(exam =>
+        exam.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     
       const getStatusColor = (status) => {
         switch (status) {
@@ -28,9 +33,6 @@ const ScheduledExamPortal = () => {
   return (
     <ScrollView style={{ paddingTop:10 , paddingHorizontal:15, }}>
       {/* <SearchBar/> */}
-      <Text style={{ color: "black", fontWeight: 800, fontSize: 20 ,marginBottom:20 }}>
-        Scheduled Exams
-      </Text>
       <View
         style={{
       paddingHorizontal:4,
@@ -53,15 +55,15 @@ const ScheduledExamPortal = () => {
             flexGrow:1,
           }}
           placeholder="Search exams or subjects..."
-          //   value={searchTerm}
-          //   onChangeText={setSearchTerm}
+            value={searchTerm}
+            onChangeText={setSearchTerm}
         />
       </View>
       <View style={{marginVertical:50, display:"flex", flexDirection:"column", gap:20, marginBottom:50}}>
           <>
           {
-            scheduledExams.map((exam, i)=>(
-                <Card key={i} title={exam.title} topic={exam.subject} status={exam.status} statusColor={getStatusColor} formatDate={formatDate} duration={exam.duration} date={exam.date} questions={exam.questions}/>
+            filteredExams.map((exam, i)=>(
+                <Card key={i} title={exam.title} topic={exam.subject} status={exam.status} statusColor={getStatusColor} formatDate={formatDate} duration={exam.duration} date={exam.date} questions={exam.questions} id={exam.id}/>
             ))
           }
           </>
@@ -74,17 +76,21 @@ export default ScheduledExamPortal;
 
 
 
-const Card = ({title, topic, status, date, duration, questions, statusColor, formatDate})=>{
+const Card = ({title, topic, status, date, duration, questions, statusColor, formatDate, id})=>{
+  const router = useRouter()
+
     const bg=statusColor(status)
     const dt=formatDate(date)
     const getButton = (status) => {
       switch (status) {
         case 'upcoming':
-          return  <TouchableOpacity style={{paddingHorizontal:10, paddingVertical:8, backgroundColor:"#3071FF", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:10, marginVertical:10}}>
+          return  <TouchableOpacity onPress={()=>router.push(`exam/${id}`)} style={{paddingHorizontal:10, paddingVertical:8, backgroundColor:"#3071FF", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:10, marginVertical:10}}>
           <Text style={{color:"white", fontSize:18, fontWeight:"600"}}>Start Exam</Text>
          </TouchableOpacity>
         case 'completed':
-          return  <TouchableOpacity style={{paddingHorizontal:10, paddingVertical:8, backgroundColor:"#4BB543", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:10, marginVertical:10}}>
+          return  <TouchableOpacity onPress={()=>{
+            
+            router.push(`result/${id}`)}} style={{paddingHorizontal:10, paddingVertical:8, backgroundColor:"#4BB543", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:10, marginVertical:10}}>
           <Text style={{color:"white", fontSize:18, fontWeight:"600"}}>View Results</Text>
          </TouchableOpacity>
         default:
