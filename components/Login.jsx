@@ -9,11 +9,12 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { Link, useRouter } from "expo-router";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -29,6 +30,7 @@ const LoginSchema = Yup.object().shape({
 const Login = () => {
   const { login } = useAuth();
   const router = useRouter();
+  const [isVisible, setIsVisible] = useState(false);
 
   const onLogin = async (values) => {
     // Simulating token storage and login action
@@ -73,17 +75,16 @@ const Login = () => {
               password: values.password,
             })
             .then((res) => {
-              alert(JSON.stringify(res));
               AsyncStorage.setItem("token", res.data.token);
-              alert(res.data.message);
+              ToastAndroid.show(res.data.message, ToastAndroid.SHORT);
               login(); // Trigger context login
               router.replace("/home");
             })
             .catch((err) => {
               if (Platform.OS === "android") {
-                ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+                ToastAndroid.show(err?.response?.data?.message, ToastAndroid.SHORT);
               } else if (Platform.OS === "ios") {
-                Alert.alert("Error", errorMessage); // For iOS
+                Alert.alert("Error", err?.response?.data?.message); // For iOS
               } else {
                 alert(err?.response?.data?.message);
               }
@@ -102,7 +103,7 @@ const Login = () => {
           errors,
           touched,
         }) => (
-          <View style={{padding:10}}>
+          <View style={{ padding: 10 }}>
             <View>
               <Text
                 style={{
@@ -147,25 +148,41 @@ const Login = () => {
               >
                 Password
               </Text>
-              <TextInput
-                editable
-                placeholder="Password"
-                secureTextEntry
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                value={values.password}
+              <View
                 style={{
-                  padding: 8,
+                 padding: 8,
                   width: 355,
                   borderRadius: 4,
                   marginVertical: 8,
                   backgroundColor: "#dee2e7",
+                  flexDirection: "row", // Set flexDirection to row to align items in a row
+                  alignItems: "center", // Center the items vertically
+                  justifyContent: "space-between",
+                  backgroundColor: "#dee2e7",
                 }}
-              />
-              {touched.password && errors.password && (
-                <Text style={{ color: "#e31c33", fontSize: 12 }}>
-                  {errors.password}
-                </Text>
+              >
+                <TextInput
+                  editable
+                  placeholder="Password"
+                  secureTextEntry={!isVisible} // Set based on visibility state
+                  onChangeText={handleChange("password")}
+                  onBlur={handleBlur("password")}
+                  value={values.password}
+                  style={{
+                    flex: 1, // This makes the TextInput take up remaining space
+                    marginRight: 10, // Add some space between input and icon
+                  }}
+                />
+                <TouchableOpacity onPress={() => setIsVisible(!isVisible)}>
+                  <Ionicons
+                    name={isVisible ? "eye-off" : "eye"} // Toggle between icons
+                    size={24}
+                    color="grey"
+                  />
+                </TouchableOpacity>
+              </View>
+              {errors.password && touched.password && (
+                <Text style={{ color: "red" }}>{errors.password}</Text>
               )}
             </View>
 

@@ -1,11 +1,11 @@
-import React from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
 import { IndexPath, Layout, Select, SelectItem } from "@ui-kitten/components";
 import { Link, useRouter } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-
+import Ionicons from "react-native-vector-icons/Ionicons";
 // Data for the roles
 const roleData = ["Admin", "Examiner", "Student"];
 
@@ -24,6 +24,7 @@ const SignupSchema = Yup.object().shape({
 
 const Signup = () => {
   const [selectedIndex, setSelectedIndex] = React.useState(new IndexPath(0));
+  const [isVisible, setIsVisible] = useState(false);
   const router = useRouter();
 
   const displayValue = roleData[selectedIndex.row];
@@ -50,10 +51,11 @@ const Signup = () => {
           .then((res) => {
             console.log(res);
             router.push("/login");
+            ToastAndroid.show(res.data.message, ToastAndroid.SHORT);
           })
           .catch((err) => {
             // Check if err.response exists, otherwise log a generic error message
-            alert(err);
+            alert(err?.response?.data?.message);
             console.log(err);
             // if (err.response && err.response.data) {
             //   alert(err.response.data);
@@ -119,7 +121,7 @@ const Signup = () => {
                 width: 355,
                 borderRadius: 4,
                 marginVertical: 8,
-                backgroundColor: "#EDEFF2",
+                backgroundColor: "#dee2e7",
               }}
             />
             {errors.fullName && touched.fullName && (
@@ -151,7 +153,7 @@ const Signup = () => {
                 width: 355,
                 borderRadius: 4,
                 marginVertical: 8,
-                backgroundColor: "#EDEFF2",
+                backgroundColor: "#dee2e7",
               }}
             />
             {errors.email && touched.email && (
@@ -172,21 +174,39 @@ const Signup = () => {
             >
               Password
             </Text>
-            <TextInput
-              editable
-              placeholder="Password"
-              secureTextEntry
-              onChangeText={handleChange("password")}
-              onBlur={handleBlur("password")}
-              value={values.password}
+            <View
               style={{
-                padding: 8,
+                paddingHorizontal: 8,
+                paddingVertical: 8,
                 width: 355,
                 borderRadius: 4,
                 marginVertical: 8,
-                backgroundColor: "#EDEFF2",
+                flexDirection: "row", // Set flexDirection to row to align items in a row
+                alignItems: "center", // Center the items vertically
+                justifyContent: "space-between",
+                backgroundColor: "#dee2e7",
               }}
-            />
+            >
+              <TextInput
+                editable
+                placeholder="Password"
+                secureTextEntry={!isVisible} // Set based on visibility state
+                onChangeText={handleChange("password")}
+                onBlur={handleBlur("password")}
+                value={values.password}
+                style={{
+                  flex: 1, // This makes the TextInput take up remaining space
+                  marginRight: 10, // Add some space between input and icon
+                }}
+              />
+              <TouchableOpacity onPress={() => setIsVisible(!isVisible)}>
+                <Ionicons
+                  name={isVisible ? "eye-off" : "eye"} // Toggle between icons
+                  size={24}
+                  color="grey"
+                />
+              </TouchableOpacity>
+            </View>
             {errors.password && touched.password && (
               <Text style={{ color: "red" }}>{errors.password}</Text>
             )}
@@ -213,7 +233,7 @@ const Signup = () => {
                   setSelectedIndex(index);
                   setFieldValue("role", roleData[index.row]);
                 }}
-                style={{ backgroundColor: "#EDEFF2", borderWidth: 0 }}
+                style={{ backgroundColor: "#dee2e7", borderWidth: 0 }}
               >
                 {roleData.map(renderOption)}
               </Select>

@@ -6,6 +6,7 @@ import Login from "../../components/Login";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "expo-router";
+import ScheduledExamPortal from "../../components/ScheduledExamPortal";
 const Home = () => {
   const { logout } = useAuth();
   const router = useRouter();
@@ -25,13 +26,7 @@ const Home = () => {
           style={{ height: 55, width: 123 }}
         />
       </View>
-      <Text>Home</Text>
-      <Button onPress={async()=>{
-        await AsyncStorage.removeItem('token');
-      
-        logout();
-        router.replace('/login')
-      }} title="Click"></Button>
+     <ScheduledExamPortal/>
     </View>
   );
 };

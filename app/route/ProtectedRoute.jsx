@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { View, Text, Button } from 'react-native';
 import { useRouter } from 'expo-router';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      // Redirect to login after render phase
+      router.replace('/login');
+    }
+  }, [isAuthenticated, router]);
+
   if (!isAuthenticated) {
-    // Redirect to login if not authenticated
-    router.replace('/login');
+    // Prevent rendering protected content if not authenticated
     return null;
   }
 
