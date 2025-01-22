@@ -34,7 +34,7 @@ const Login = () => {
 
   const onLogin = async (values) => {
     // Simulating token storage and login action
-    axios.post("http://192.168.0.116:8000/users/sign-in", {
+    axios.post("http://localhost:8000/users/sign-in", {
       email: values.email,
       password: values.password,
     });
@@ -70,7 +70,7 @@ const Login = () => {
         }}
         onSubmit={(values) => {
           axios
-            .post("http://192.168.0.116:8000/users/sign-in", {
+            .post("http://10.0.2.2:8000/users/sign-in", {
               email: values.email,
               password: values.password,
             })
@@ -81,6 +81,7 @@ const Login = () => {
               router.replace("/home");
             })
             .catch((err) => {
+              console.log(err?.response?.data?.message)
               if (Platform.OS === "android") {
                 ToastAndroid.show(err?.response?.data?.message, ToastAndroid.SHORT);
               } else if (Platform.OS === "ios") {

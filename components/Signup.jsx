@@ -41,30 +41,34 @@ const Signup = () => {
       }}
       validationSchema={SignupSchema}
       onSubmit={(values) => {
+        console.log("submitting")
         axios
-          .post("http://192.168.0.116:8000/users/sign-up", {
+          .post("http://10.0.2.2:8000/users/sign-up", {
             fullname: values.fullName,
             email: values.email,
             password: values.password,
             role: values.role,
           })
           .then((res) => {
+            console.log("hitting")
             console.log(res);
             router.push("/login");
             ToastAndroid.show(res.data.message, ToastAndroid.SHORT);
           })
           .catch((err) => {
             // Check if err.response exists, otherwise log a generic error message
-            alert(err?.response?.data?.message);
-            console.log(err);
+            // alert(err?.response?.data?.message);
+            console.log("err:",JSON.stringify(err));
+            // ToastAndroid.show(err, ToastAndroid.SHORT);
+
             // if (err.response && err.response.data) {
             //   alert(err.response.data);
             // } else {
             //   alert('An error occurred. Please try again.');
             // }
           });
-        console.log(values);
-        alert(JSON.stringify(values, null, 2));
+        // console.log(values);
+        // alert(JSON.stringify(values, null, 2));
       }}
     >
       {({
